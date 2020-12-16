@@ -43,10 +43,10 @@
 							<view class="text-grey">日期:{{item.Fdate}}</view>
 							<view class="text-grey">单号:{{item.FBillNo}}</view>
 							<view class="text-grey">编码:{{item.FItemNumber}}</view>
-							<view class="text-grey">名称:{{item.FItemName}}</view>
-							<view class="text-grey">规格:{{item.FModel}}</view>
+							<view class="text-grey">备注型号:{{item.FNoteType}}</view>
+							<view class="text-grey" style="width: 100%;">名称:{{item.FItemName}}</view>
+							<view class="text-grey" style="width: 100%;">规格:{{item.FModel}}</view>
 							<!-- <view class="text-grey">数量:{{item.Fauxqty}}</view> -->
-							<view class="text-grey" style="width: 100%;">备注型号:{{item.FNoteType}}</view>
 							<view class="text-grey" style="width: 100%;">供应商:{{item.FSupplyName}}</view>
 						</view>
 					</view>

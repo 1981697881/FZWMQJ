@@ -157,9 +157,9 @@
 						<label style="height:100%;display: flex;align-items: center;padding: 20rpx;position: relative;border-bottom: 1px solid #e4e4e4;" @click="_showlv2(index)">
 							<view style="clear: both;width: 100%;" class="grid text-center col-2">
 								<view class="itemT">编码:{{ item.number }}</view>
-								<view class="itemT">名称:{{ item.name }}</view>
 								<view class="itemT">单位:{{ item.unitName }}</view>
-								<view class="itemT">规格:{{ item.model }}</view>
+								<view class="itemT" style="width: 85% !important;text-align: left;margin-left: 110rpx;">名称:{{ item.name }}</view>
+								<view class="itemT" style="width: 85% !important;text-align: left;margin-left: 110rpx;">规格:{{ item.model }}</view>
 								<view class="itemT">应发数量:{{ item.Fauxqty }}</view>
 								<view class="itemT">实际数量:{{ item.FCounty }}</view>
 							</view>
@@ -291,6 +291,14 @@ export default {
 		};
 	},
 	onLoad: function(option) {
+		uni.$on('scancodedate', function(data) {
+			// _this 这里面的方法用这个 _this.code(data.code)
+			uni.showToast({
+				icon: 'none',
+				title: data.code
+			});
+			console.log('你想要的code：', data.code);
+		});
 		let me = this;
 		if (JSON.stringify(option) != '{}') {
 			this.isOrder = true;

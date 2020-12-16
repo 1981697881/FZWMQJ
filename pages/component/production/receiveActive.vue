@@ -36,10 +36,10 @@
 							<view class="text-grey">编码:{{ item.FItemNumber }}</view>
 							<view class="text-grey">名称:{{ item.FItemName }}</view>
 							<view class="text-grey">规格:{{ item.FModel }}</view>
-							<!-- <view class="text-grey">数量:{{item.Fauxqty}}</view> -->
+							<!-- <view class="text-grey">数量:{{item.Fauxqty}}</view> 
 							<view class="text-grey">金蝶号:{{ item.FKDNo }}</view>
-							<view class="text-grey">流水卡号:{{ item.FCardNum }}</view>
-							<view class="text-grey" style="width: 100%;">线路名称:{{ item.FTranWay }}</view>
+							<view class="text-grey">流程卡号:{{ item.FCardNum }}</view>
+							<view class="text-grey" style="width: 100%;">线路名称:{{ item.FTranWay }}</view>-->
 						</view>
 					</view>
 				</view>

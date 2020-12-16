@@ -1,16 +1,18 @@
 <template>
-	<view><components v-if="PageCur == 'component'"></components></view>
+	<view>
+		<scan-code></scan-code>
+		<components v-if="PageCur == 'component'"></components>
+	</view>
 </template>
-
 <script>
+import scanCode from '@/components/scan-code/scan-code.vue';
 import service from '../../service.js';
 import store from '@/store';
 import login from '@/api/login';
 import basic from '@/api/basic';
 import { mapState } from 'vuex';
-import scanCode from "@/components/scan-code/scan-code.vue";  
 export default {
-	components: { scanCode },  
+	components: { scanCode },
 	data() {
 		return {
 			PageCur: 'component',
@@ -30,7 +32,7 @@ export default {
 					const data = {
 						account: service.getUsers()[0].account,
 						password: service.getUsers()[0].password
-					}; 
+					};
 					if (data.account && data.password) {
 						login
 							.login(data)
@@ -74,22 +76,27 @@ export default {
 				url: '../login/login'
 			});
 		}
-		plus.key.addEventListener('backbutton',()=>{
-		   if(back_k){
-						plus.runtime.quit();
-		   }else{
-						uni.showToast({
-						title:"再按一次退出应用",
-						icon:'none'
-						});
-					}
-						back_k ++
-		   setTimeout(()=>{
-						back_k --
-		   },3000)
-		  }, false);
+		plus.key.addEventListener(
+			'backbutton',
+			() => {
+				if (back_k) {
+					plus.runtime.quit();
+				} else {
+					uni.showToast({
+						title: '再按一次退出应用',
+						icon: 'none'
+					});
+				}
+				back_k++;
+				setTimeout(() => {
+					back_k--;
+				}, 3000);
+			},
+			false
+		);
 	},
 	onLoad() {
+		
 		this.plusReady();
 		var that = this;
 		uni.getSystemInfo({
@@ -99,14 +106,10 @@ export default {
 				}
 			}
 		});
-		uni.$on('scancodedate',function(data){
-		     // _this 这里面的方法用这个 _this.code(data.code)  
-		 console.log('你想要的code：', data.code)  
-		})  
 	},
-	onUnload() {  
-	   // 移除监听事件      
-	   uni.$off('scancodedate')  
+	onUnload() {
+		// 移除监听事件
+		uni.$off('scancodedate');
 	},
 	methods: {
 		NavChange: function(e) {
@@ -123,7 +126,7 @@ export default {
 		AndroidCheckUpdate2() {
 			var that = this;
 			uni.request({
-				url: service.getUrls().url+'/pda/output.json', //获取最新版本号
+				url: service.getUrls().url + '/pda/output.json', //获取最新版本号
 				method: 'GET',
 				data: {},
 				success: res => {
@@ -146,7 +149,7 @@ export default {
 
 						//res.data.androidurl    是apk的下载链接
 						console.log('准备');
-						var dtask = plus.downloader.createDownload(service.getUrls().url+'/pda/fzwmxy.apk', {}, function(d, status) {
+						var dtask = plus.downloader.createDownload(service.getUrls().url + '/pda/fzwmxy.apk', {}, function(d, status) {
 							console.log('开始');
 							// 下载完成
 							if (status == 200) {
@@ -177,11 +180,11 @@ export default {
 			var _this = this;
 			uni.request({
 				//请求地址，设置为自己的服务器链接
-				url: service.getUrls().url+'/pda/output.json',
+				url: service.getUrls().url + '/pda/output.json',
 				method: 'GET',
 				data: {},
 				success: resMz => {
-					console.log(resMz)
+					console.log(resMz);
 					var server_version = resMz.data[0].apkData.versionName;
 					var currTimeStamp = new Date().getTime();
 					// 判断缓存时间
@@ -225,7 +228,7 @@ export default {
 		},
 		downWgt: function() {
 			var that = this;
-			var downloadApkUrl = service.getUrls().url+'/pda/fzwmxy.apk';
+			var downloadApkUrl = service.getUrls().url + '/pda/fzwmxy.apk';
 			var dtask = plus.downloader.createDownload(downloadApkUrl, {}, function(d, status) {
 				// 下载完成
 				if (status == 200) {
@@ -238,11 +241,10 @@ export default {
 					});
 				} else {
 					uni.showToast({
-						title: '下载更新失败',
+						title: '下载更新失败'
 					});
 					plus.nativeUI.closeWaiting();
 				}
-				
 			});
 			//监听下载
 			dtask.addEventListener('statechanged', function(download, status) {
@@ -263,7 +265,7 @@ export default {
 						break;
 					case 4:
 						uni.showToast({
-							title: '下载完成',
+							title: '下载完成'
 						});
 						plus.nativeUI.closeWaiting();
 						break;
