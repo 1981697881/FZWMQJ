@@ -97,17 +97,17 @@
 			}
 		},
 		created(){
-			if(service.getUsers()[0].account !='' && typeof service.getUsers()[0].account != "undefined"){
-			this.account = service.getUsers()[0].account
-			this.password = service.getUsers()[0].password
-			}	
 			if(service.getUrls().url !='' && typeof service.getUrls().url != "undefined"){
 				this.popupForm.URL = service.getUrls().url
 				this.service = true
 			}else{
 				this.service = false
 				this.modalName = 'Modal'
-			}
+			} 
+			if(service.getUsers()[0].account !='' && typeof service.getUsers()[0].account != "undefined"){
+			this.account = service.getUsers()[0].account
+			this.password = service.getUsers()[0].password
+			}	
 		 plus.key.addEventListener('backbutton',()=>{
 		    if(back_k){
 				plus.runtime.quit();

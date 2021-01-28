@@ -30,7 +30,16 @@
 				</view>
 				<view class="action">
 					<view style="width: 90px;">仓库:</view>
-					<ld-select :list="stockList" disabled list-key="FName" value-key="FNumber" placeholder="请选择" clearable v-model="form.fdCStockId" @change="stockChange"></ld-select>
+					<ld-select
+						:list="stockList"
+						disabled
+						list-key="FName"
+						value-key="FNumber"
+						placeholder="请选择"
+						clearable
+						v-model="form.fdCStockId"
+						@change="stockChange"
+					></ld-select>
 				</view>
 			</view>
 			<view class="cu-bar bg-white solid-bottom" style="height: 60upx;">
@@ -157,9 +166,9 @@
 						<label style="height:100%;display: flex;align-items: center;padding: 20rpx;position: relative;border-bottom: 1px solid #e4e4e4;" @click="_showlv2(index)">
 							<view style="clear: both;width: 100%;" class="grid text-center col-2">
 								<view class="itemT">编码:{{ item.number }}</view>
+								<view class="itemT">名称:{{ item.name }}</view>
 								<view class="itemT">单位:{{ item.unitName }}</view>
-								<view class="itemT" style="width: 85% !important;text-align: left;margin-left: 110rpx;">名称:{{ item.name }}</view>
-								<view class="itemT" style="width: 85% !important;text-align: left;margin-left: 110rpx;">规格:{{ item.model }}</view>
+								<view class="itemT">规格:{{ item.model }}</view>
 								<view class="itemT">应发数量:{{ item.Fauxqty }}</view>
 								<view class="itemT">实际数量:{{ item.FCounty }}</view>
 							</view>
@@ -177,13 +186,19 @@
 									<checkbox :checked="item2.checked" disabled="true" v-else />
 								</checkbox-group>
 								<view style="clear: both;width: 100%;" class="grid text-center col-2">
-									<view class="itemO">批号:{{ item2.FBatchNo}}</view>
-									<view class="itemO">仓库:{{ item2.FStockName}}</view>
+									<view class="itemO">批号:{{ item2.FBatchNo }}</view>
+									<view class="itemO">仓库:{{ item2.FStockName }}</view>
 									<view class="itemO">仓位:{{ item2.FStockPlacename }}</view>
 									<view class="itemO">库存数:{{ item2.FQty }}</view>
 									<view class="itemO" style="width: 80% !important;">
-										<view class="title" style="float: left;margin-left: 25%;" >出库数:</view>
-										<input name="input" @input='setQuty($event, index)' type="digit" style="font-size: 13px;text-align: left;border-bottom: 1px solid;" v-model="item2.quantity" />
+										<view class="title" style="float: left;margin-left: 25%;">出库数:</view>
+										<input
+											name="input"
+											@input="setQuty($event, index)"
+											type="digit"
+											style="font-size: 13px;text-align: left;border-bottom: 1px solid;"
+											v-model="item2.quantity"
+										/>
 									</view>
 								</view>
 							</view>
@@ -234,9 +249,7 @@ export default {
 		return {
 			finalList: [],
 			menuKey: 1,
-			cuIList: [
-				
-			],
+			cuIList: [],
 			show: false,
 			title: '选择库存',
 			formatName: 'FName',
@@ -290,16 +303,17 @@ export default {
 			billNo: null
 		};
 	},
+	onUnload() {
+		// 移除监听事件
+		uni.$off('scancodedate');
+	},
 	onLoad: function(option) {
+		let me = this;
 		uni.$on('scancodedate', function(data) {
 			// _this 这里面的方法用这个 _this.code(data.code)
-			uni.showToast({
-				icon: 'none',
-				title: data.code
-			});
+			me.getScanInfo(data.code);
 			console.log('你想要的code：', data.code);
 		});
-		let me = this;
 		if (JSON.stringify(option) != '{}') {
 			this.isOrder = true;
 			this.isDis = true;
@@ -390,46 +404,45 @@ export default {
 		}
 	},
 	methods: {
-		setQuty(val, index){
-			let list = this.cuIList[index].childrenList
-			let count = 0
-			list.forEach((item, index)=>{
-				if(item.checked){
-					if(item.quantity<= item.FQty){
-						if(item.quantity != '' && item.quantity != null){
-							count += Number(item.quantity)
+		setQuty(val, index) {
+			let list = this.cuIList[index].childrenList;
+			let count = 0;
+			list.forEach((item, index) => {
+				if (item.checked) {
+					if (item.quantity <= item.FQty) {
+						if (item.quantity != '' && item.quantity != null) {
+							count += Number(item.quantity);
 						}
-					}else{
-						item.quantity = 0
+					} else {
+						item.quantity = 0;
 						return uni.showToast({
 							icon: 'none',
 							title: '输入数量不能大于库存数量'
 						});
 					}
-					
 				}
-			})
-			this.cuIList[index].FCounty = count
+			});
+			this.cuIList[index].FCounty = count;
 		},
 		_showlv2(index) {
-			if(this.cuIList[index].isLoading){
+			if (this.cuIList[index].isLoading) {
 				//展开二级目录
 				if (this.cuIList[index].show) {
 					this.$set(this.cuIList[index], 'show', false);
 				} else {
 					this.$set(this.cuIList[index], 'show', true);
 				}
-			}else{
+			} else {
 				basic
 					.selectInvListByItemNumber({ itemNumber: this.cuIList[index].number })
 					.then(reso => {
 						if (reso.success) {
 							let data = reso.data;
-							data.forEach((item, index) =>{
-								item.quantity = 0
-								item.checked = false
-							})
-							this.cuIList[index].isLoading = true
+							data.forEach((item, index) => {
+								item.quantity = 0;
+								item.checked = false;
+							});
+							this.cuIList[index].isLoading = true;
 							this.cuIList[index].childrenList = data;
 							//展开二级目录
 							if (this.cuIList[index].show) {
@@ -449,81 +462,78 @@ export default {
 			}
 		},
 		_chooseAll(item, index) {
-			if(this.cuIList[index].isLoading){
+			if (this.cuIList[index].isLoading) {
 				//选中一级目录的所有 FCounty
-				let count = 0
+				let count = 0;
 				if (this.cuIList[index].checked) {
 					this.$set(this.cuIList[index], 'checked', false);
 					this.cuIList[index].childrenList.forEach(item => {
 						item.checked = false;
-						count = 0
+						count = 0;
 					});
 				} else {
 					this.$set(this.cuIList[index], 'checked', true);
 					this.cuIList[index].childrenList.forEach(item => {
 						item.checked = true;
-						console.log(item)
-						if(item.quantity == '' || item.quantity ==null){
-							count+= Number(0)
-						}else{
-							count+= Number(item.quantity)
-						}
-					}); 
-				}
-				this.cuIList[index].FCounty = count
-				this.$set(this.cuIList[index], "show", true);
-			}else{
-			basic
-				.selectInvListByItemNumber({ itemNumber: this.cuIList[index].number })
-				.then(reso => {
-					if (reso.success) {
-						let data = reso.data;
-						this.cuIList[index].isLoading = true
-						data.forEach((item, index) =>{
-							item.quantity = 0
-							item.checked = false
-						})
-						this.cuIList[index].childrenList = data;
-						//选中一级目录的所有 FCounty
-						let count = 0
-						if (this.cuIList[index].checked) {
-							this.$set(this.cuIList[index], 'checked', false);
-							this.cuIList[index].childrenList.forEach(item => {
-								item.checked = false;
-								console.log(item)
-								if(item.quantity == '' || item.quantity ==null){
-									count+= Number(0)
-								}else{
-									count+= Number(item.quantity)
-								} 
-							});
+						console.log(item);
+						if (item.quantity == '' || item.quantity == null) {
+							count += Number(0);
 						} else {
-							this.$set(this.cuIList[index], 'checked', true);
-							this.cuIList[index].childrenList.forEach(item => {
-								item.checked = true;
-								console.log(item)
-								if(item.quantity == '' || item.quantity ==null){
-									count+= Number(0)
-								}else{
-									count+= Number(item.quantity)
-								}
-							}); 
+							count += Number(item.quantity);
 						}
-						this.cuIList[index].FCounty = count
-						this.$set(this.cuIList[index], "show", true);
-						this.$forceUpdate();
-					}
-				})
-				.catch(err => {
-					uni.showToast({
-						icon: 'none',
-						title: err.msg
 					});
-				});
-			}	
-			
-			
-			
+				}
+				this.cuIList[index].FCounty = count;
+				this.$set(this.cuIList[index], 'show', true);
+			} else {
+				basic
+					.selectInvListByItemNumber({ itemNumber: this.cuIList[index].number })
+					.then(reso => {
+						if (reso.success) {
+							let data = reso.data;
+							this.cuIList[index].isLoading = true;
+							data.forEach((item, index) => {
+								item.quantity = 0;
+								item.checked = false;
+							});
+							this.cuIList[index].childrenList = data;
+							//选中一级目录的所有 FCounty
+							let count = 0;
+							if (this.cuIList[index].checked) {
+								this.$set(this.cuIList[index], 'checked', false);
+								this.cuIList[index].childrenList.forEach(item => {
+									item.checked = false;
+									console.log(item);
+									if (item.quantity == '' || item.quantity == null) {
+										count += Number(0);
+									} else {
+										count += Number(item.quantity);
+									}
+								});
+							} else {
+								this.$set(this.cuIList[index], 'checked', true);
+								this.cuIList[index].childrenList.forEach(item => {
+									item.checked = true;
+									console.log(item);
+									if (item.quantity == '' || item.quantity == null) {
+										count += Number(0);
+									} else {
+										count += Number(item.quantity);
+									}
+								});
+							}
+							this.cuIList[index].FCounty = count;
+							this.$set(this.cuIList[index], 'show', true);
+							this.$forceUpdate();
+						}
+					})
+					.catch(err => {
+						uni.showToast({
+							icon: 'none',
+							title: err.msg
+						});
+					});
+			}
 		},
 		_chooseOne(i1, i2) {
 			if (this.cuIList[i1].childrenList[i2].checked) {
@@ -534,10 +544,10 @@ export default {
 					//判断是否全部都是选中
 					this.$set(this.cuIList[i1], 'checked', false);
 				}
-				if(this.cuIList[i1].childrenList[i2].quantity == '' || this.cuIList[i1].childrenList[i2].quantity == null){
-					return
-				}else{
-					this.cuIList[i1].FCounty = this.cuIList[i1].FCounty - Number(this.cuIList[i1].childrenList[i2].quantity)
+				if (this.cuIList[i1].childrenList[i2].quantity == '' || this.cuIList[i1].childrenList[i2].quantity == null) {
+					return;
+				} else {
+					this.cuIList[i1].FCounty = this.cuIList[i1].FCounty - Number(this.cuIList[i1].childrenList[i2].quantity);
 				}
 			} else {
 				//增加勾选
@@ -547,10 +557,10 @@ export default {
 					//判断是否全部都是选中
 					this.$set(this.cuIList[i1], 'checked', true);
 				}
-				if(this.cuIList[i1].childrenList[i2].quantity == '' || this.cuIList[i1].childrenList[i2].quantity == null){
-					return
-				}else{
-					this.cuIList[i1].FCounty = this.cuIList[i1].FCounty + Number(this.cuIList[i1].childrenList[i2].quantity)
+				if (this.cuIList[i1].childrenList[i2].quantity == '' || this.cuIList[i1].childrenList[i2].quantity == null) {
+					return;
+				} else {
+					this.cuIList[i1].FCounty = this.cuIList[i1].FCounty + Number(this.cuIList[i1].childrenList[i2].quantity);
 				}
 			}
 		},
@@ -570,8 +580,8 @@ export default {
 				});
 			});
 		},
-		deleteItem(item,index) {
-			let me = this
+		deleteItem(item, index) {
+			let me = this;
 			uni.showModal({
 				title: '温馨提示',
 				content: '是否删除当前行,删除将无法复原？',
@@ -673,13 +683,13 @@ export default {
 			let isBatchNo = false;
 			let batchMsg = '';
 			let me = this;
-			let cIndex = 0
+			let cIndex = 0;
 			for (let i in list) {
-				let children = list[i].childrenList
-				console.log(list[i])
-				children.forEach((item, index) =>{
-					if(item.checked){
-						cIndex ++
+				let children = list[i].childrenList;
+				console.log(list[i]);
+				children.forEach((item, index) => {
+					if (item.checked) {
+						cIndex++;
 						let obj = {};
 						obj.fauxqty = item.quantity;
 						obj.fentryId = cIndex;
@@ -718,7 +728,7 @@ export default {
 						obj.funitId = item.FUnitID;
 						array.push(obj);
 					}
-				})
+				});
 			}
 			portData.items = array;
 			portData.ftranType = 21;
@@ -738,50 +748,50 @@ export default {
 			}
 			console.log(JSON.stringify(portData));
 			//if (result.length == 0) {
-				if (portData.fcustId != '' && typeof portData.fcustId != 'undefined') {
-					//if (isBatchNo) {
-						sales
-							.saleStockOut(portData)
-							.then(res => {
-								if (res.success) {
-									this.cuIList = [];
-									uni.showToast({
-										icon: 'success',
-										title: res.msg
-									});
-									this.form.bNum = 0;
-									this.initMain();
-									if (this.isOrder) {
-										setTimeout(function() {
-											uni.$emit('handleBack', { startDate: me.startDate, endDate: me.endDate, source: me.source });
-											uni.navigateBack({
-												url: '../sales/salesActive'
-											});
-										}, 1000);
-									}
-								}
-							})
-							.catch(err => {
-								uni.showToast({
-									icon: 'none',
-									title: err.msg
-								});
-								this.isClick = false;
+			if (portData.fcustId != '' && typeof portData.fcustId != 'undefined') {
+				//if (isBatchNo) {
+				sales
+					.saleStockOut(portData)
+					.then(res => {
+						if (res.success) {
+							this.cuIList = [];
+							uni.showToast({
+								icon: 'success',
+								title: res.msg
 							});
-					/* } else {
+							this.form.bNum = 0;
+							this.initMain();
+							if (this.isOrder) {
+								setTimeout(function() {
+									uni.$emit('handleBack', { startDate: me.startDate, endDate: me.endDate, source: me.source });
+									uni.navigateBack({
+										url: '../sales/salesActive'
+									});
+								}, 1000);
+							}
+						}
+					})
+					.catch(err => {
+						uni.showToast({
+							icon: 'none',
+							title: err.msg
+						});
+						this.isClick = false;
+					});
+				/* } else {
 						uni.showToast({
 							icon: 'none',
 							title: batchMsg
 						});
 						this.isClick = false;
 					} */
-				} else {
-					uni.showToast({
-						icon: 'none',
-						title: '客户不能为空'
-					});
-					this.isClick = false;
-				}
+			} else {
+				uni.showToast({
+					icon: 'none',
+					title: '客户不能为空'
+				});
+				this.isClick = false;
+			}
 			/* } else {
 				uni.showToast({
 					icon: 'none',
@@ -790,48 +800,48 @@ export default {
 				this.isClick = false;
 			} */
 		},
-		submitCom(){
+		submitCom() {
 			var me = this;
-			if(me.popupForm.positions !='' && me.popupForm.positions !=null){
-				basic.selectFdCStockIdByFdCSPId({'fdCSPId':me.popupForm.positions}).then(reso => {
-					if(reso.data != null && reso.data != ''){
-						if(reso.data['FIsStockMgr']){
+			if (me.popupForm.positions != '' && me.popupForm.positions != null) {
+				basic.selectFdCStockIdByFdCSPId({ fdCSPId: me.popupForm.positions }).then(reso => {
+					if (reso.data != null && reso.data != '') {
+						if (reso.data['FIsStockMgr']) {
 							me.borrowItem.stockName = reso.data['stockName'];
 							me.borrowItem.stockId = reso.data['stockNumber'];
 							me.borrowItem.FIsStockMgr = reso.data['FIsStockMgr'];
-							me.borrowItem.positions = me.popupForm.positions
-							me.borrowItem.quantity = me.popupForm.quantity
-							me.borrowItem.fbatchNo = me.popupForm.fbatchNo
-							me.modalName2 = null 
-						}else{
+							me.borrowItem.positions = me.popupForm.positions;
+							me.borrowItem.quantity = me.popupForm.quantity;
+							me.borrowItem.fbatchNo = me.popupForm.fbatchNo;
+							me.modalName2 = null;
+						} else {
 							me.borrowItem.stockName = reso.data['stockName'];
 							me.borrowItem.stockId = reso.data['stockNumber'];
 							me.borrowItem.FIsStockMgr = reso.data['FIsStockMgr'];
-							me.borrowItem.positions = ''
-							me.borrowItem.quantity = me.popupForm.quantity
-							me.borrowItem.fbatchNo = me.popupForm.fbatchNo
-							me.modalName2 = null 
+							me.borrowItem.positions = '';
+							me.borrowItem.quantity = me.popupForm.quantity;
+							me.borrowItem.fbatchNo = me.popupForm.fbatchNo;
+							me.modalName2 = null;
 						}
-					}else{
+					} else {
 						uni.showToast({
 							icon: 'none',
-							title: '该库位不存在仓库中！',
+							title: '该库位不存在仓库中！'
 						});
 					}
-				})
-			}else{
-				if(me.popupForm.FIsStockMgr){
+				});
+			} else {
+				if (me.popupForm.FIsStockMgr) {
 					return uni.showToast({
 						icon: 'none',
-						title: '仓位已启用，请输入仓位！',
+						title: '仓位已启用，请输入仓位！'
 					});
-				}else{ 
-					me.borrowItem.positions = ''
-					me.borrowItem.quantity = me.popupForm.quantity
-					me.borrowItem.fbatchNo = me.popupForm.fbatchNo
-					me.modalName2 = null 
+				} else {
+					me.borrowItem.positions = '';
+					me.borrowItem.quantity = me.popupForm.quantity;
+					me.borrowItem.fbatchNo = me.popupForm.fbatchNo;
+					me.modalName2 = null;
 				}
-			} 
+			}
 		},
 		saveCom() {
 			var me = this;
@@ -841,16 +851,15 @@ export default {
 					content: '领料数量大于单据数量！请确认！',
 					success: function(res) {
 						if (res.confirm) {
-							me.submitCom()
+							me.submitCom();
 						} else if (res.cancel) {
-							return
+							return;
 						}
 					}
 				});
 			} else {
-				me.submitCom()
+				me.submitCom();
 			}
-			
 		},
 		del(index, item) {
 			this.cuIList.splice(index, 1);
@@ -951,19 +960,19 @@ export default {
 			let me = this;
 			uni.scanCode({
 				success: function(res) {
-					basic.selectFdCStockIdByFdCSPId({'fdCSPId':res.result}).then(reso => {
-						if(reso.data != null && reso.data != ''){
+					basic.selectFdCStockIdByFdCSPId({ fdCSPId: res.result }).then(reso => {
+						if (reso.data != null && reso.data != '') {
 							me.popupForm.positions = res.result;
 							me.popupForm.stockName = reso.data['stockName'];
 							me.popupForm.stockId = reso.data['stockNumber'];
 							me.popupForm.FIsStockMgr = reso.data['FIsStockMgr'];
-						}else{
+						} else {
 							uni.showToast({
 								icon: 'none',
-								title: '该库位不存在仓库中！',
+								title: '该库位不存在仓库中！'
 							});
 						}
-					})
+					});
 				}
 			});
 		},
@@ -1060,67 +1069,79 @@ export default {
 			let number = 0;
 			uni.scanCode({
 				success: function(res) {
-					basic
-						.inventoryByBarcode({ uuid: res.result })
-						.then(reso => {
-							if (reso.success) {
-								let data = reso.data							
-								/* that.chooseList = []
-							for(let i in reso.data) {
-								that.chooseList.push(reso.data[i])				
-							} 
-							that.show = true */
-								for (let i in that.cuIList) {
-									if (data[0]['FItemID'] == that.cuIList[i]['FItemID']) {
-										number++;
-										uni.showToast({
-											icon: 'none',
-											title: '该物料已存在'
-										});
-										break;
-									}
-								}
-								if (number == 0) {
-									data[0].number = data[0].FNumber;
-									data[0].name = data[0].FName;
-									data[0].unitName = data[0].FUnitName;
-									data[0].model = data[0].FModel;
-									for(var i = 0; i<data.length; i++){
-										data[i].number = data[i].FNumber;
-										data[i].name = data[i].FName;
-										data[i].unitName = data[i].FUnitName;
-										data[i].model = data[i].FModel;
-										data[i].quantity = 0;
-										data[i].checked = false;
-										data[i].stockName = data[i].FStockName;
-										data[i].stockId = data[i].FStockNumber;
-										data[i].FIsStockMgr = data[i].FIsStockMgr;
-										data[i].fbatchNo = data[i].FBatchNo;
-										data[i].unitID = data[i].FUnitID;
-									}
-									that.cuIList.push({
-										number : data[0].FNumber,
-										name : data[0].FName,
-										checked : false,
-										isLoading : false,
-										FCounty : 0,
-										unitName : data[0].FUnitName,
-										model : data[0].FModel,
-										childrenList: data
-									});
-									that.form.bNum = that.cuIList.length;
-								}
-							}
-						})
-						.catch(err => {
-							uni.showToast({
-								icon: 'none',
-								title: err.msg
-							});
-						});
+					that.getScanInfo(res.result);
 				}
 			});
-		}, // ListTouch触摸开始
+		},
+		getScanInfo(res) {
+			var that = this;
+			let number = 0;
+			basic
+				.inventoryByBarcode({ uuid: res })
+				.then(reso => {
+					console.log(reso)
+					if (reso.success) {
+						let data = reso.data;
+						/* that.chooseList = []
+			 		for(let i in reso.data) {
+			 			that.chooseList.push(reso.data[i])				
+			 		} 
+			 		that.show = true */ 
+						for (let i in that.cuIList) {
+							console.log(data[0]['FItemID'] == that.cuIList[i]['FItemID'])
+							console.log(data[0]['FItemID'] +','+ that.cuIList[i]['FItemID'])
+							if (data[0]['FItemID'] == that.cuIList[i]['FItemID']) {
+								number++;
+								uni.showToast({
+									icon: 'none',
+									title: '该物料已存在'
+								});
+								break;
+							}
+						}
+						if (number == 0) {
+							data[0].number = data[0].FNumber;
+							data[0].name = data[0].FName;
+							data[0].unitName = data[0].FUnitName;
+							data[0].model = data[0].FModel;
+							for (var i = 0; i < data.length; i++) {
+								data[i].number = data[i].FNumber;
+								data[i].name = data[i].FName;
+								data[i].unitName = data[i].FUnitName;
+								data[i].model = data[i].FModel;
+								data[i].quantity = 0;
+								data[i].checked = false;
+								data[i].stockName = data[i].FStockName;
+								data[i].stockId = data[i].FStockNumber;
+								data[i].FIsStockMgr = data[i].FIsStockMgr;
+								data[i].fbatchNo = data[i].FBatchNo;
+								data[i].unitID = data[i].FUnitID;
+							}
+							that.cuIList.push({
+								number: data[0].FNumber,
+								name: data[0].FName,
+								FItemID: data[0].FItemID,
+								checked: false,
+								isLoading: false,
+								FCounty: 0,
+								unitName: data[0].FUnitName,
+								model: data[0].FModel,
+								childrenList: data
+							});
+							console.log(data)
+							that.form.bNum = that.cuIList.length;
+						}
+						console.log(that.cuIList)
+					}
+				})
+				.catch(err => {
+					uni.showToast({
+						icon: 'none',
+						title: err.msg
+					});
+				});
+		},
+		// ListTouch触摸开始
 		ListTouchStart(e) {
 			this.listTouchStart = e.touches[0].pageX;
 		},

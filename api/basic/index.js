@@ -9,6 +9,15 @@ export default {
             },
 			data: params
         });
+    },
+	//扫码2
+    barcodeScanT(params) {
+        return Request().post('/api/materiel/barcodeScan', {
+            header: {
+				accept: '*/*'
+            },
+			data: params
+        });
     },//扫库位码查询仓库
     selectFdCStockIdByFdCSPId(params) {
         return Request().get('/api/basic/selectFdCStockIdByFdCSPId', {
