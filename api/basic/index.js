@@ -18,7 +18,8 @@ export default {
             },
 			data: params
         });
-    },//扫库位码查询仓库
+    },
+	//扫库位码查询仓库
     selectFdCStockIdByFdCSPId(params) {
         return Request().get('/api/basic/selectFdCStockIdByFdCSPId', {
             header: {

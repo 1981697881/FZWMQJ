@@ -233,7 +233,6 @@ export default {
 		uni.$on('scancodedate', function(data) {
 			// _this 这里面的方法用这个 _this.code(data.code)
 			me.getScanInfo(data.code);
-			console.log('你想要的code：', data.code);
 		});
 		me.loadModal = true;
 		me.initMain();
@@ -710,6 +709,7 @@ export default {
 			basic
 				.barcodeScanT({ uuid: res })
 				.then(reso => {
+					console.log(reso)
 					if (reso.success) {
 						if (that.isOrder) {
 							//if(reso.data['billNo'] == this.billNo){
