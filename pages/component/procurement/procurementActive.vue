@@ -94,6 +94,11 @@
 		onLoad: function (option){
 			// 列表数据默认加载
 			_self = this;
+			uni.$on('scancodedate', function(data) {
+				// _this 这里面的方法用这个 _this.code(data.code)
+				_self.keyword = data.code
+				_self.getNewsList();
+			});
 			if(JSON.stringify(option) != "{}"){
 				this.start = this.getDay('', -3).date  
 				this.end = this.getDay('', 0).date
@@ -106,6 +111,10 @@
 				this.end = this.getDay('', 0).date
 				this.getNewsList()
 			}
+		},
+		onHide() {
+			// 移除监听事件
+			uni.$off('scancodedate');
 		},
 		onReady: function() {
 				 var me = this

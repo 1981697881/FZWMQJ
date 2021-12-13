@@ -70,7 +70,7 @@
 			</view>
 		</view>
 		<view class="cu-modal" :class="modalName2 == 'Modal' ? 'show' : ''">
-			<view class="cu-dialog" style="height: 460upx;">
+			<view class="cu-dialog" style="height: 380upx;">
 				<view class="cu-bar bg-white justify-end" style="height: 60upx;">
 					<view class="content">{{ popupForm.headName }}</view>
 					<view class="action" @tap="hideModal2"><text class="cuIcon-close text-red"></text></view>
@@ -98,7 +98,7 @@
 								<view class="cu-form-group">
 									<view class="title">库位:</view>
 									<input name="input" style="border-bottom: 1px solid;" v-model="popupForm.positions" />
-									<button class="cu-btn round lines-red line-red shadow" @tap="$manyCk(scanPosition)">扫码</button>
+									<!-- <button class="cu-btn round lines-red line-red shadow" @tap="$manyCk(scanPosition)">扫码</button> -->
 								</view>
 							</view>
 						</view>
@@ -224,16 +224,16 @@ export default {
 			endDate: null
 		};
 	},
-	onUnload() {
+	/* onUnload() {
 		// 移除监听事件
 		uni.$off('scancodedate');
-	},
+	}, */
 	onLoad: function(option) {
 		const me = this;
-		uni.$on('scancodedate', function(data) {
+		/* uni.$on('scancodedate', function(data) {
 			// _this 这里面的方法用这个 _this.code(data.code)
 			me.getScanInfo(data.code);
-		});
+		}); */
 		me.loadModal = true;
 		me.initMain();
 		if (JSON.stringify(option) != '{}') {
