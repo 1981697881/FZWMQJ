@@ -77,11 +77,13 @@
 				end: '',
 				keyword: '',
 				onoff: true,
+				isScan: false,
 				pageHeight: 0,
 				cuIconList: [],
 			};
 		},
 		onShow: function (option){
+			_self = this;
 			uni.$on("handleBack", res => {
 			    this.start = res.startDate
 			    this.end = res.endDate
@@ -90,6 +92,12 @@
 				// 清除监听
 			    uni.$off('handleBack')
 			})
+			uni.$on('scancodedate', function(data) {
+				// _this 这里面的方法用这个 _this.code(data.code)
+				_self.keyword = data.code
+				_self.isScan= true
+				_self.getNewsList();
+			});
 		},
 		onLoad: function (option){
 			// 列表数据默认加载
@@ -97,6 +105,7 @@
 			uni.$on('scancodedate', function(data) {
 				// _this 这里面的方法用这个 _this.code(data.code)
 				_self.keyword = data.code
+				_self.isScan= true
 				_self.getNewsList();
 			});
 			if(JSON.stringify(option) != "{}"){
@@ -198,8 +207,14 @@
 					.getOrderList(this.qFilter())
 					.then(res => {
 						if (res.success) {
-							console.log(res);
 							_self.cuIconList = res.data.list;
+							console.log(_self.isScan && _self.cuIconList.length>0)
+							if(_self.isScan && _self.cuIconList.length>0){
+								uni.navigateTo({
+									url: '../procurement/procurementPassive?billNo='+res.data.list[0].FBillNo+'&tranType='+this.source+'&type=2&startDate='+this.start+'&endDate='+this.end+'&FDeptNumber='+res.data.list[0].FDeptNumber+'&FSupplyID='+res.data.list[0].FSupplyNumber+'&FSupplyName='+res.data.list[0].FSupplyName
+								});
+								_self.isScan = false;
+							}
 							uni.hideNavigationBarLoading();
 							uni.stopPullDownRefresh(); //得到数据后停止下拉刷新
 						} 
@@ -258,7 +273,7 @@
 			      },
 				  inputChange(e){
 				      this.keyword = e.detail.value
-						this.getNewsList(e.detail.value)	  
+						/* this.getNewsList(e.detail.value) */	  
 				   },
 				  compareDate(date1,date2){
 				                  var oDate1 = new Date(date1);
@@ -291,7 +306,6 @@
 			const me = this
 			if (this.start.length > 5 && this.end.length > 5) {
 				if(!this.compareDate(this.start,this.end)){
-					console.log(JSON.stringify(this.qFilter()))
 				me.getNewsList()
 				}else{
 					uni.showToast({

@@ -261,6 +261,8 @@ export default {
 						me.form.FSupplyName = data[0].FSupplyName;
 						me.form.FPOStyle = data[0].FPOStyle;
 						me.form.bNum = data.length;
+						me.$set(me.form, 'fdCStockName', me.stockList[0].FName);
+						me.$set(me.form, 'fdCStockId', me.stockList[0].FNumber);
 						for (let i in data) {
 							me.cuIList.push({
 								Fdate: data[i].Fdate,
@@ -278,7 +280,11 @@ export default {
 								fsourceTranType: data[i].FTranType,
 								fsourceEntryID: data[i].FEntryID,
 								unitID: data[i].FUnitNumber,
-								unitName: data[i].FUnitName
+								unitName: data[i].FUnitName,
+								stockName:  me.stockList[0].FName,
+								FIsStockMgr: me.stockList[0].FIsStockMgr,
+								stockId: me.stockList[0].FNumber,
+								positions: ''
 							});
 						}
 					}
